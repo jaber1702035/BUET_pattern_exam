@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f5bea">
+<title>OMR Answer Sheet + Written Script</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📝%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--text:#1b2230;--muted:#667085;--line:#d9dfe9;--accent:#2f5bea;--soft:#e8eeff;--ok:#1a8f4c;--bad:#c93a3a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11151b;--card:#1a202a;--text:#e8ecf2;--muted:#9aa4b5;--line:#2b3340;--accent:#7b9bff;--soft:#222c4a;--ok:#4cc58a;--bad:#ef7777;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151b;--card:#1a202a;--text:#e8ecf2;--muted:#9aa4b5;--line:#2b3340;--accent:#7b9bff;--soft:#222c4a;--ok:#4cc58a;--bad:#ef7777;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI","Noto Sans Bengali","Nirmala UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:10}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.narrow{max-width:520px;margin:6vh auto 0}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 18px;font-size:14px}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
+input[type=text]{width:100%;font:inherit;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--text)}
+input[type=text]:focus{outline:none;border-color:var(--accent)}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin:8px 0 0}
+button.b,a.b{display:inline-block;text-decoration:none;font:inherit;padding:11px 20px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--text);cursor:pointer}
+button.p,a.p{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button.b:disabled{opacity:.5;cursor:default}
+.hidden{display:none!important}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.bar .who{flex:1;min-width:150px;font-size:14px}
+.bar .who b{font-size:15px}
+.cnt{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.prog{height:4px;background:var(--line);border-radius:4px;overflow:hidden;width:100%}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.sheet{display:grid;grid-auto-flow:column;grid-template-rows:repeat(20,auto);gap:0 28px}
+@media(max-width:700px){.sheet{grid-auto-flow:row;grid-template-rows:none}}
+.row{display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--line)}
+.row .n{width:30px;text-align:right;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.row .bs{display:flex;gap:12px;margin-left:auto;margin-right:auto}
+.bub{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--muted);font:inherit;font-weight:700;font-size:15px;cursor:pointer;display:grid;place-items:center;padding:0}
+.bub:hover{border-color:var(--accent)}
+.bub.on{background:var(--text);border-color:var(--text);color:var(--card)}
+.row.un.warn{background:rgba(201,58,58,.1)}
+.foot{display:flex;justify-content:flex-end;margin-top:16px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:20;padding:16px}
+.mbox{background:var(--card);border-radius:14px;padding:22px;max-width:380px;width:100%;border:1px solid var(--line)}
+.mbox h2{margin:0 0 8px;font-size:18px}
+.mbtn{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.done{text-align:center}
+.done .acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.tick{width:64px;height:64px;border-radius:50%;background:var(--ok);color:#fff;font-size:34px;display:grid;place-items:center;margin:0 auto 12px}
+.theme{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;z-index:6}
+
+/* attach step */
+.who2{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--soft);border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:14px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:26px 14px;text-align:center;cursor:pointer;background:var(--bg);transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--soft)}
+.drop .ic{font-size:30px;line-height:1}
+.drop b{display:block;margin-top:6px}
+.drop span{color:var(--muted);font-size:13px}
+.files{list-style:none;margin:12px 0 0;padding:0}
+.files li{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--bg)}
+.files .nm{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.files .meta{color:var(--muted);font-size:12px;display:block}
+.files .ib{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;font:inherit;padding:0}
+.files .ib:disabled{opacity:.35;cursor:default}
+.files .ib.x{color:var(--bad)}
+.tot{font-size:13px;color:var(--muted);margin:6px 0 0}
+.tot.warn{color:var(--bad)}
+.acts2{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-top:18px}
+.acts2 .r{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto}
+.note{font-size:13px;color:var(--muted);margin:10px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Step 1: details -->
+  <div class="card narrow" id="s1" style="max-width:480px">
+    <h1>OMR Answer Sheet</h1>
+    <p class="sub">40 MCQ · Options A, B, C, D · Fill in your details to begin.</p>
+    <label for="name">Name</label>
+    <input type="text" id="name" autocomplete="off" placeholder="Your full name">
+    <label for="roll">Roll</label>
+    <input type="text" id="roll" autocomplete="off" placeholder="Your roll number">
+    <p class="err" id="err1"></p>
+    <button class="b p" id="start" style="width:100%;margin-top:6px">Start</button>
+  </div>
+
+  <!-- Step 2: OMR -->
+  <div id="s2" class="hidden">
+    <div class="bar">
+      <div class="who"><b id="wName"></b><br><span style="color:var(--muted)">Roll: <span id="wRoll"></span></span></div>
+      <div>Answered <span class="cnt" id="cnt">0</span> / 40</div>
+      <div class="prog"><i id="pg"></i></div>
+    </div>
+    <div class="card">
+      <div class="sheet" id="sheet"></div>
+      <div class="foot"><button class="b p" id="submit">Finish OMR</button></div>
+    </div>
+  </div>
+
+  <!-- Step 3: attach written script -->
+  <div class="card narrow hidden" id="s3">
+    <h1>Attach written answer script</h1>
+    <p class="sub">Wrote answers on paper? Attach your scanned PDF (or photos) here. It will be added after the OMR page in one final PDF.</p>
+    <div class="who2"><span><b id="aName"></b></span><span>Roll: <b id="aRoll"></b></span><span id="aCnt"></span></div>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose files to attach">
+      <div class="ic">📎</div>
+      <b>Tap to choose your written script</b>
+      <span>PDF, JPG or PNG · you can add more than one file</span>
+    </div>
+    <input type="file" id="file" class="hidden" accept="application/pdf,.pdf,image/jpeg,image/png,.jpg,.jpeg,.png" multiple>
+
+    <ul class="files" id="files"></ul>
+    <p class="tot" id="tot"></p>
+    <p class="err" id="err3"></p>
+
+    <div class="acts2">
+      <button class="b" id="backOmr">← Back to OMR</button>
+      <div class="r">
+        <button class="b" id="skip">Skip, OMR only</button>
+        <button class="b p" id="make" disabled>Create final PDF</button>
+      </div>
+    </div>
+    <p class="note">Files stay on your device. Nothing is uploaded anywhere.</p>
+  </div>
+
+  <!-- Step 4: done -->
+  <div class="card done narrow hidden" id="s4" style="max-width:480px">
+    <div class="tick">✓</div>
+    <h1>Answer script ready</h1>
+    <p class="sub" id="doneMsg"></p>
+    <p class="note" id="tip">If the Download button does nothing, tap <b>Open PDF</b> and save from there. Inside WhatsApp/Facebook/Messenger? Open this page in Chrome or Safari first.</p>
+    <div class="acts">
+      <a class="b p" id="dl" download>Download PDF</a>
+      <button class="b hidden" id="share">Share / Send</button>
+      <a class="b" id="openLink" target="_blank" rel="noopener">Open PDF</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="modal">
+  <div class="mbox">
+    <h2>Finish OMR?</h2>
+    <p id="mtxt" style="margin:0;color:var(--muted)"></p>
+    <div class="mbtn">
+      <button class="b" id="back">Go back</button>
+      <button class="b p" id="ok">OK</button>
+    </div>
+  </div>
+</div>
+<button class="theme" id="theme" title="Toggle theme">◐</button>
+
+<!-- pdf-lib (cdnjs first, jsDelivr as fallback) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script>
+if(!window.PDFLib){
+  document.write('<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');
+}
+</script>
+<script>
+const N=40, L=['A','B','C','D'];
+const MAX_FILES=20, WARN_MB=25;
+const ans=Array(N).fill(-1);
+let info={name:'',roll:''}, lastBlob=null, lastName='', lastUrl=null;
+let files=[]; // {file,name,size,kind:'pdf'|'img',pages}
+const $=id=>document.getElementById(id);
+const show=id=>{['s1','s2','s3','s4'].forEach(s=>$(s).classList.toggle('hidden',s!==id));window.scrollTo(0,0)};
+
+// ---------- Build sheet ----------
+const sheet=$('sheet');
+for(let i=0;i<N;i++){
+  const r=document.createElement('div');r.className='row un';r.id='r'+i;
+  const n=document.createElement('span');n.className='n';n.textContent=i+1;
+  const bs=document.createElement('div');bs.className='bs';
+  L.forEach((l,j)=>{
+    const b=document.createElement('button');b.className='bub';b.textContent=l;
+    b.setAttribute('aria-label','Question '+(i+1)+' option '+l);
+    b.onclick=()=>{ans[i]=ans[i]===j?-1:j;refresh()};
+    bs.appendChild(b);
+  });
+  r.append(n,bs);sheet.appendChild(r);
+}
+function refresh(){
+  let c=0;
+  for(let i=0;i<N;i++){
+    const r=$('r'+i);
+    r.querySelectorAll('.bub').forEach((b,j)=>b.classList.toggle('on',ans[i]===j));
+    r.classList.toggle('un',ans[i]<0);
+    if(ans[i]>=0){c++;r.classList.remove('warn')}
+  }
+  $('cnt').textContent=c;$('pg').style.width=(c/N*100)+'%';
+}
+
+// ---------- Step 1 ----------
+$('start').onclick=()=>{
+  const n=$('name').value.trim(), r=$('roll').value.trim();
+  if(!n||!r){$('err1').textContent='Please enter both name and roll.';return}
+  info={name:n,roll:r};
+  $('wName').textContent=n;$('wRoll').textContent=r;
+  show('s2');
+};
+['name','roll'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')$('start').click()}));
+
+// ---------- Step 2: finish OMR ----------
+$('submit').onclick=()=>{
+  const un=ans.filter(x=>x<0).length;
+  $('mtxt').textContent=un===0?'All 40 questions answered. Click OK to continue to the next step.':'You have '+un+' unanswered question'+(un>1?'s':'')+'. Click OK to continue anyway, or go back to finish.';
+  if(un>0)for(let i=0;i<N;i++)if(ans[i]<0)$('r'+i).classList.add('warn');
+  $('modal').classList.remove('hidden');
+};
+$('back').onclick=()=>$('modal').classList.add('hidden');
+$('ok').onclick=()=>{
+  $('modal').classList.add('hidden');
+  $('aName').textContent=info.name;$('aRoll').textContent=info.roll;
+  $('aCnt').textContent='Answered '+ans.filter(x=>x>=0).length+' / 40';
+  show('s3');
+};
+$('backOmr').onclick=()=>show('s2');
+
+// ---------- Step 3: attach files ----------
+const fmtSize=b=>b<1024*1024?Math.max(1,Math.round(b/1024))+' KB':(b/1024/1024).toFixed(1)+' MB';
+const isPdf=f=>f.type==='application/pdf'||/\.pdf$/i.test(f.name);
+const isImg=f=>/^image\/(jpeg|png)$/.test(f.type)||/\.(jpe?g|png)$/i.test(f.name);
+
+$('drop').onclick=()=>$('file').click();
+$('drop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('file').click()}});
+['dragenter','dragover'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.add('over')}));
+['dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.remove('over')}));
+$('drop').addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+$('file').onchange=e=>{addFiles(e.target.files);e.target.value=''};
+
+async function addFiles(list){
+  const err=$('err3');err.textContent='';
+  const bad=[];
+  for(const f of Array.from(list)){
+    if(files.length>=MAX_FILES){bad.push('Maximum '+MAX_FILES+' files allowed.');break}
+    if(isPdf(f)){
+      try{
+        if(!window.PDFLib)throw new Error('lib');
+        const d=await PDFLib.PDFDocument.load(await f.arrayBuffer(),{ignoreEncryption:true});
+        const pages=d.getPageCount();
+        if(!pages)throw new Error('empty');
+        files.push({file:f,name:f.name,size:f.size,kind:'pdf',pages});
+      }catch(e){bad.push(f.name+' could not be read (is it password-protected or damaged?).')}
+    }else if(isImg(f)){
+      files.push({file:f,name:f.name,size:f.size,kind:'img',pages:1});
+    }else{
+      bad.push(f.name+' is not a PDF, JPG or PNG.');
+    }
+  }
+  if(bad.length)err.textContent=bad.join(' ');
+  renderFiles();
+}
+function renderFiles(){
+  const ul=$('files');ul.innerHTML='';
+  files.forEach((f,i)=>{
+    const li=document.createElement('li');
+    const nm=document.createElement('div');nm.className='nm';
+    const t=document.createElement('span');t.textContent=f.name;
+    const m=document.createElement('span');m.className='meta';
+    m.textContent=(f.kind==='pdf'?'PDF · '+f.pages+' page'+(f.pages>1?'s':''):'Image · 1 page')+' · '+fmtSize(f.size);
+    nm.append(t,m);
+    const mk=(txt,label,fn,dis,cls)=>{const b=document.createElement('button');b.className='ib'+(cls?' '+cls:'');b.textContent=txt;b.title=label;b.setAttribute('aria-label',label);b.disabled=!!dis;b.onclick=fn;return b};
+    li.append(nm,
+      mk('↑','Move up',()=>{[files[i-1],files[i]]=[files[i],files[i-1]];renderFiles()},i===0),
+      mk('↓','Move down',()=>{[files[i+1],files[i]]=[files[i],files[i+1]];renderFiles()},i===files.length-1),
+      mk('✕','Remove',()=>{files.splice(i,1);renderFiles()},false,'x'));
+    ul.appendChild(li);
+  });
+  const pages=files.reduce((a,f)=>a+f.pages,0), bytes=files.reduce((a,f)=>a+f.size,0);
+  const tot=$('tot');
+  tot.textContent=files.length?files.length+' file'+(files.length>1?'s':'')+' · '+pages+' page'+(pages>1?'s':'')+' · '+fmtSize(bytes):'';
+  const big=bytes>WARN_MB*1024*1024;
+  tot.classList.toggle('warn',big);
+  if(big)tot.textContent+=' · Large file. It may be hard to send; try a smaller scan.';
+  $('make').disabled=files.length===0;
+}
+$('skip').onclick=()=>run(false);
+$('make').onclick=()=>run(true);
+
+// ---------- Draw OMR page on canvas (supports Bengali names) ----------
+function drawCanvas(){
+  const W=1240,H=1754,c=document.createElement('canvas');c.width=W;c.height=H;
+  const g=c.getContext('2d');
+  const F='"Noto Sans Bengali","Nirmala UI","Segoe UI",system-ui,-apple-system,Arial,sans-serif';
+  g.fillStyle='#fff';g.fillRect(0,0,W,H);
+  g.fillStyle='#111';g.textBaseline='middle';
+  g.strokeStyle='#111';g.lineWidth=3;g.strokeRect(50,50,W-100,H-100);
+  g.font='700 44px '+F;g.textAlign='center';g.fillText('OMR ANSWER SHEET',W/2,115);
+  g.font='28px '+F;g.fillStyle='#444';g.fillText('40 MCQ · Options A B C D',W/2,162);
+  g.textAlign='left';g.fillStyle='#111';
+  g.font='600 30px '+F;
+  g.fillText('Name:',100,235);g.fillText('Roll:',100,290);
+  g.font='30px '+F;
+  g.fillText(info.name,215,235);g.fillText(info.roll,215,290);
+  const answered=ans.filter(x=>x>=0).length;
+  g.textAlign='right';g.font='26px '+F;g.fillStyle='#444';
+  g.fillText('Date: '+new Date().toLocaleString(),W-100,235);
+  g.fillText('Answered: '+answered+' / 40',W-100,290);
+  g.textAlign='left';
+  g.lineWidth=2;g.beginPath();g.moveTo(100,335);g.lineTo(W-100,335);g.stroke();
+  const rowH=62,top0=395,cols=[100,660];
+  for(let i=0;i<N;i++){
+    const col=i<20?0:1,row=i%20,x=cols[col],y=top0+row*rowH;
+    g.fillStyle='#111';g.font='600 28px '+F;g.textAlign='right';
+    g.fillText(String(i+1),x+60,y);
+    for(let j=0;j<4;j++){
+      const cx=x+130+j*85;
+      g.beginPath();g.arc(cx,y,22,0,Math.PI*2);
+      g.lineWidth=2.5;g.strokeStyle='#111';
+      if(ans[i]===j){g.fillStyle='#111';g.fill();g.stroke();g.fillStyle='#fff'}
+      else{g.fillStyle='#fff';g.fill();g.stroke();g.fillStyle='#555'}
+      g.font='600 22px '+F;g.textAlign='center';g.fillText(L[j],cx,y+1);
+    }
+    g.strokeStyle='#ddd';g.lineWidth=1;g.beginPath();g.moveTo(x,y+rowH/2);g.lineTo(x+500,y+rowH/2);g.stroke();
+  }
+  g.textAlign='center';g.fillStyle='#777';g.font='22px '+F;
+  g.fillText('Generated from the online OMR sheet',W/2,H-80);
+  return c;
+}
+
+// ---------- Helpers ----------
+const blobOf=(cv,type,q)=>new Promise(r=>cv.toBlob(r,type,q));
+async function imageToJpeg(file){
+  let bmp;
+  try{bmp=await createImageBitmap(file,{imageOrientation:'from-image'})}
+  catch(e){bmp=await createImageBitmap(file)}
+  const max=2000,s=Math.min(1,max/Math.max(bmp.width,bmp.height));
+  const cv=document.createElement('canvas');
+  cv.width=Math.max(1,Math.round(bmp.width*s));cv.height=Math.max(1,Math.round(bmp.height*s));
+  const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);
+  g.drawImage(bmp,0,0,cv.width,cv.height);
+  if(bmp.close)bmp.close();
+  const blob=await blobOf(cv,'image/jpeg',0.85);
+  return {bytes:await blob.arrayBuffer(),w:cv.width,h:cv.height};
+}
+
+// ---------- Build the final PDF ----------
+async function run(withFiles){
+  const btns=['make','skip','backOmr'].map($);btns.forEach(b=>b.disabled=true);
+  const err=$('err3');err.textContent='Preparing your PDF… please wait.';err.style.color='var(--muted)';
+  try{
+    try{
+      if(document.fonts&&document.fonts.load){
+        await Promise.all([
+          document.fonts.load('600 30px "Noto Sans Bengali"',info.name),
+          document.fonts.load('30px "Noto Sans Bengali"',info.name)
+        ]);
+      }
+    }catch(e){}
+    const base='OMR_'+(info.roll.replace(/[^A-Za-z0-9_-]+/g,'_').replace(/^_+|_+$/g,'')||'student');
+    const omr=drawCanvas();
+    const omrBlob=await blobOf(omr,'image/jpeg',0.92);
+    let writtenPages=0;
+
+    if(window.PDFLib){
+      const {PDFDocument}=PDFLib;
+      const out=await PDFDocument.create();
+      const A4=[595.28,841.89];
+      const jpg=await out.embedJpg(await omrBlob.arrayBuffer());
+      out.addPage(A4).drawImage(jpg,{x:0,y:0,width:A4[0],height:A4[1]});
+
+      if(withFiles){
+        for(const f of files){
+          if(f.kind==='pdf'){
+            const src=await PDFDocument.load(await f.file.arrayBuffer(),{ignoreEncryption:true});
+            const pages=await out.copyPages(src,src.getPageIndices());
+            pages.forEach(p=>out.addPage(p));writtenPages+=pages.length;
+          }else{
+            const im=await imageToJpeg(f.file);
+            const emb=await out.embedJpg(im.bytes);
+            const page=out.addPage(A4),m=24;
+            const sc=Math.min((A4[0]-2*m)/im.w,(A4[1]-2*m)/im.h);
+            const w=im.w*sc,h=im.h*sc;
+            page.drawImage(emb,{x:(A4[0]-w)/2,y:(A4[1]-h)/2,width:w,height:h});
+            writtenPages++;
+          }
+        }
+      }
+      out.setTitle('Answer script – '+info.name+' ('+info.roll+')');
+      const bytes=await out.save();
+      lastBlob=new Blob([bytes],{type:'application/pdf'});
+      lastName=base+(writtenPages?'_with_written':'')+'.pdf';
+    }else{
+      // PDF library could not load: fall back to OMR image only
+      lastBlob=omrBlob;lastName=base+'.jpg';
+      writtenPages=-1;
+    }
+
+    if(lastUrl)URL.revokeObjectURL(lastUrl);
+    lastUrl=URL.createObjectURL(lastBlob);
+    const isPdfOut=lastName.endsWith('.pdf');
+    const kind=isPdfOut?'PDF':'image';
+    const dl=$('dl');dl.href=lastUrl;dl.download=lastName;dl.textContent='Download '+kind;
+    const ol=$('openLink');ol.href=lastUrl;ol.textContent='Open '+kind;
+    const sh=$('share');
+    let canShare=false;
+    try{
+      const tf=new File([lastBlob],lastName,{type:lastBlob.type});
+      canShare=!!(navigator.canShare&&navigator.canShare({files:[tf]}));
+    }catch(e){}
+    sh.classList.toggle('hidden',!canShare);
+    lastWritten=writtenPages;
+    $('doneMsg').textContent=doneText();
+    show('s4');
+    autoDownload();
+    err.textContent='';
+  }catch(e){
+    console.error(e);
+    err.style.color='var(--bad)';
+    err.textContent='Something went wrong while creating the PDF. Remove the last file and try again.';
+    btns.forEach(b=>b.disabled=false);
+    $('make').disabled=files.length===0;
+    return;
+  }
+  btns.forEach(b=>b.disabled=false);
+  $('make').disabled=files.length===0;
+  err.style.color='';
+}
+
+// ---------- Download: works in Claude preview AND on GitHub Pages ----------
+const inClaude=()=>typeof claude!=='undefined'&&claude&&typeof claude.use==='function';
+async function claudeSave(){
+  // Claude preview has its own download service; returns true if it handled the save
+  if(!inClaude())return false;
+  try{
+    const d=await claude.use('downloads');
+    if(!d)return false;
+    await d.save({filename:lastName,data:lastBlob});
+    return true;
+  }catch(e){
+    return !!(e&&e.code==='declined'); // user cancelled: don't retry
+  }
+}
+function nativeDownload(){
+  try{
+    const a=document.createElement('a');
+    a.href=lastUrl;a.download=lastName;a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>a.remove(),500);
+  }catch(e){}
+}
+async function autoDownload(){
+  if(!(await claudeSave()))nativeDownload();
+}
+// In Claude preview the plain link is blocked, so use its download service on tap.
+// On a normal website (GitHub Pages) the link works natively and this does nothing.
+$('dl').addEventListener('click',async e=>{
+  if(!inClaude())return;
+  e.preventDefault();
+  if(!(await claudeSave()))nativeDownload();
+});
+
+// ---------- Result message + share ----------
+let lastWritten=0;
+function doneText(){
+  let what='OMR sheet';
+  if(lastWritten>0)what='OMR sheet + '+lastWritten+' written page'+(lastWritten>1?'s':'');
+  if(lastWritten<0)what='OMR sheet only (PDF tool could not load, so the written script is not included)';
+  return what+' · '+lastName+'. Tap Download, then send it to your teacher.';
+}
+$('share').onclick=async()=>{
+  try{
+    const f=new File([lastBlob],lastName,{type:lastBlob.type});
+    await navigator.share({files:[f],title:lastName});
+  }catch(e){/* cancelled */}
+};
+
+$('theme').onclick=()=>{
+  const r=document.documentElement,dark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const cur=r.dataset.theme||(dark?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark';
+};
+</script>
+</body>
+</html>
